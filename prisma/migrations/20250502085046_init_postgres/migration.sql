@@ -1,15 +1,19 @@
 -- CreateTable
 CREATE TABLE "YearlyArrivals" (
-    "year" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "count" INTEGER NOT NULL
+    "year" INTEGER NOT NULL,
+    "count" INTEGER NOT NULL,
+
+    CONSTRAINT "YearlyArrivals_pkey" PRIMARY KEY ("year")
 );
 
 -- CreateTable
 CREATE TABLE "CountryExpenditure" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "country" TEXT NOT NULL,
     "year" INTEGER NOT NULL,
-    "averageExpenditure" REAL NOT NULL
+    "averageExpenditure" DOUBLE PRECISION NOT NULL,
+
+    CONSTRAINT "CountryExpenditure_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
