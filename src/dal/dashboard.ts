@@ -32,4 +32,26 @@ export async function getCountryExpenditures() {
     console.error('Database Error: Failed to fetch country expenditures.', error)
     throw new Error('Failed to fetch country expenditure data.')
   }
+}
+
+/**
+ * Gets country-specific arrival records for a given year, ordered by count descending.
+ * @param year The year to fetch data for.
+ * @returns A promise that resolves to an array of CountryArrivals objects.
+ */
+export async function getCountryArrivalsByYear(year: number) {
+  try {
+    const countryArrivals = await prisma.countryArrivals.findMany({
+      where: {
+        year: year,
+      },
+      orderBy: {
+        count: 'desc',
+      },
+    })
+    return countryArrivals
+  } catch (error) {
+    console.error(`Database Error: Failed to fetch country arrivals for ${year}.`, error)
+    throw new Error(`Failed to fetch country arrivals data for ${year}.`)
+  }
 } 

@@ -27,3 +27,12 @@ model CountryExpenditure {
 
   @@unique([country, year]) // 国名と年の組み合わせでユニーク
 }
+
+model CountryArrivals {
+  id      Int    @id @default(autoincrement())
+  country String
+  year    Int
+  count   Int
+
+  @@unique([country, year])
+}

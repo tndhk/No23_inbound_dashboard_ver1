@@ -23,6 +23,13 @@ interface ExpenditureCsvRow {
   消費単価: string // Average Expenditure
 }
 
+// Interface for the new CountryArrivals data
+interface CountryArrival {
+  country: string
+  year: number
+  count: number
+}
+
 async function main() {
   console.log('Starting seeding process...')
 
@@ -38,7 +45,7 @@ async function main() {
     // 2. Parse and process CSV data
     console.log('Parsing and processing CSV data...')
 
-    // Process Arrivals
+    // Process Arrivals (Yearly Total)
     const arrivalsParseResult = Papa.parse<ArrivalsCsvRow>(arrivalsCsvString, { header: true, skipEmptyLines: true })
     const yearlyArrivalsData = arrivalsParseResult.data
       .filter(row => row.Country === '総数')
@@ -47,6 +54,16 @@ async function main() {
         count: parseInt(row['Total Visitors'], 10),
       }))
       .filter(item => !isNaN(item.year) && !isNaN(item.count));
+
+    // Process Arrivals (Country Specific)
+    const countryArrivalsData: CountryArrival[] = arrivalsParseResult.data
+      .filter(row => row.Country !== '総数' && !row.Country.includes('計') && row.Country) // Filter out total/subtotal rows and empty country names
+      .map(row => ({
+        country: row.Country.trim(),
+        year: parseInt(row.Year, 10),
+        count: parseInt(row['Total Visitors'], 10),
+      }))
+      .filter(item => item.country && !isNaN(item.year) && !isNaN(item.count)); // Ensure valid data
 
     // Process Expenditure
     const expenditureParseResult = Papa.parse<ExpenditureCsvRow>(expenditureCsvString, { header: true, skipEmptyLines: true })
@@ -67,19 +84,26 @@ async function main() {
       console.log('Clearing existing data...')
       await tx.yearlyArrivals.deleteMany()
       await tx.countryExpenditure.deleteMany()
+      await tx.countryArrivals.deleteMany() // Clear new table too
       console.log('Existing data cleared.')
 
-      // Insert new data using loops with create
+      // Insert YearlyArrivals data
       console.log(`Inserting ${yearlyArrivalsData.length} yearly arrivals records...`)
       for (const arrival of yearlyArrivalsData) {
         await tx.yearlyArrivals.create({ data: arrival })
       }
 
+      // Insert CountryArrivals data
+      console.log(`Inserting ${countryArrivalsData.length} country arrivals records...`)
+      for (const arrival of countryArrivalsData) {
+        await tx.countryArrivals.create({ data: arrival })
+      }
+
+      // Insert CountryExpenditure data
       console.log(`Inserting ${countryExpenditureData.length} country expenditure records...`)
-      const currentYear = new Date().getFullYear(); // Or derive year from CSV if available
+      const currentYear = new Date().getFullYear();
       for (const expenditure of countryExpenditureData) {
         await tx.countryExpenditure.create({
-          // Ensure the year field exists in the data object for the DB
           data: { ...expenditure, year: currentYear },
         })
       }
