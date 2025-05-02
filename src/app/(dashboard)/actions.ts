@@ -12,16 +12,7 @@ const DATA_DIR = path.join(process.cwd(), 'data')
 const ARRIVALS_CSV_PATH = path.join(DATA_DIR, 'arrivals', 'country_visitors_by_year.csv')
 const EXPENDITURE_CSV_PATH = path.join(DATA_DIR, 'expenditure', 'a1_travel_expenditure_by_country.csv')
 
-// Interfaces for parsed data (matching Prisma schema ideally)
-interface YearlyArrival { // Corresponds to YearlyArrivals model
-  year: number
-  count: number
-}
-
-interface CountryExpenditureInput { // Corresponds to CountryExpenditure model (input)
-  country: string
-  averageExpenditure: number
-}
+// Removed unused interfaces: YearlyArrival, CountryExpenditureInput
 
 // Type definition for PapaParse results
 interface ArrivalsCsvRow {
@@ -107,11 +98,15 @@ export async function updateDashboardData(): Promise<{
     console.log('Cache revalidated for / (dashboard).')
 
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Data update failed:', error)
+    let errorMessage = 'An unknown error occurred during data update.';
+    if (error instanceof Error) {
+      errorMessage = error.message; // Extract message safely
+    }
     return {
       success: false,
-      error: error.message || 'An unknown error occurred during data update.',
+      error: errorMessage,
     }
   }
 } 
