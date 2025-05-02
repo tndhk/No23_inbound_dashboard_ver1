@@ -26,7 +26,11 @@ export async function getYearlyArrivals() {
  */
 export async function getCountryExpenditures() {
   try {
-    const countryExpenditures = await prisma.countryExpenditure.findMany()
+    const countryExpenditures = await prisma.countryExpenditure.findMany({
+      orderBy: {
+        averageExpenditure: 'desc',
+      },
+    })
     return countryExpenditures
   } catch (error) {
     console.error('Database Error: Failed to fetch country expenditures.', error)

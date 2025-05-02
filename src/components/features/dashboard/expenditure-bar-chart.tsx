@@ -37,6 +37,9 @@ const formatYAxisTick = (tick: number) => {
 }
 
 export function ExpenditureBarChart({ data }: ExpenditureBarChartProps) {
+  const topN = 15 // Show top 15 countries
+  const chartData = data.slice(0, topN)
+
   return (
     <Card>
       <CardHeader>
@@ -46,7 +49,7 @@ export function ExpenditureBarChart({ data }: ExpenditureBarChartProps) {
       <CardContent>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart
-            data={data}
+            data={chartData}
             margin={{
               top: 5,
               right: 30,
@@ -57,7 +60,7 @@ export function ExpenditureBarChart({ data }: ExpenditureBarChartProps) {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="country"
-              angle={-45}
+              angle={-90}
               textAnchor="end"
               interval={0}
               // tick={{ fontSize: 10 }} // Removed for now to check lint error
